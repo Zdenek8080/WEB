@@ -1,0 +1,14 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /tmp/
+Allow: /
+
+Crawl-delay: 1
+
+Sitemap: https://naramzovou.cz/sitemap.xml
+
+Clean-param: ref /
+Clean-param: utm_source /
+Clean-param: utm_medium /
+Clean-param: utm_campaign /
+Clean-param: gclid /

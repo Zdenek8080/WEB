@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <title>Rezervace | naRamzovou</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Bootstrap core CSS -->
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Additional CSS Files -->
+  <link rel="stylesheet" href="assets/css/fontawesome.css">
+  <link rel="stylesheet" href="assets/css/templatemo-villa-agency.css">
+  <link rel="stylesheet" href="assets/css/owl.css">
+  <link rel="stylesheet" href="assets/css/animate.css">
+
+  <!-- FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet">
+
+  <style>
+    /* Zvýraznění víkendů */
+    .fc-day-sat, .fc-day-sun {
+      background-color: #f0f8ff;
+    }
+    /* Zvýraznění státních svátků */
+    .holiday {
+      background-color: #ffe4e1 !important;
+    }
+  </style>
+</head>
+<body>
+
+<header class="header-area header-sticky">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <nav class="main-nav">
+          <a href="index.html" class="logo">
+            <h1>naRamzovou</h1>
+          </a>
+          <ul class="nav">
+            <li><a href="index.html">Úvod</a></li>
+            <li><a href="index.html#featured">Apartmán</a></li>
+            <li><a href="rezervace.html" class="active">Rezervace</a></li>
+            <li><a href="index.html#contact">Kontakt</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="page-heading header-text">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <h3>Rezervace</h3>
+        <span class="breadcrumb">
+          <a href="index.html">Úvod</a> / Rezervace
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section best-deal">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 offset-lg-2">
+        <div class="section-heading text-center">
+          <h6>| Dostupnost</h6>
+          <h2>Kalendář obsazenosti</h2>
+          <p>
+            Pokud je v kalendáři den označen, je apartmán v daném termínu
+            <strong>obsazen</strong>.
+          </p>
+        </div>
+
+        <div id="calendar"></div>
+
+        <div class="text-center mt-4">
+          <p>
+            Máte zájem o pobyt?  
+            Kontaktujte nás na
+            <a href="mailto:naramzovou@gmail.com">naramzovou@gmail.com</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="col-lg-12">
+      <p>© <span id="year"></span> naRamzovou · Všechna práva vyhrazena</p>
+    </div>
+  </div>
+</footer>
+
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- FullCalendar JS -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ical.js/build/ical.min.js"></script>
+
+<script>
+document.getElementById("year").textContent = new Date().getFullYear();
+
+// Inicializace FullCalendar
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
+
+  const calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: 'cs',
+    initialView: 'dayGridMonth',
+    firstDay: 1, // týden začíná pondělím
+    height: 'auto',
+    headerToolbar: {
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,listMonth'
+    },
+    dayMaxEvents: true,
+    dayCellClassNames: function(arg) {
+      const month = arg.date.getMonth() + 1;
+      const day = arg.date.getDate();
+
+      const fixedHolidays = [
+        { day: 1, month: 1 },
+        { day: 1, month: 5 },
+        { day: 8, month: 5 },
+        { day: 5, month: 7 },
+        { day: 6, month: 7 },
+        { day: 28, month: 9 },
+        { day: 28, month: 10 },
+        { day: 17, month: 11 },
+        { day: 24, month: 12 },
+        { day: 25, month: 12 },
+        { day: 26, month: 12 }
+      ];
+
+      const isHoliday = fixedHolidays.some(h => h.day === day && h.month === month);
+      return isHoliday ? ['holiday'] : [];
+    },
+    events: async function(fetchInfo, successCallback, failureCallback) {
+      try {
+        const icalUrl = 'https://ical.booking.com/v1/export/t/7c9fc327-a134-4438-b238-0b00207683ef.ics';
+        const res = await fetch(icalUrl);
+        const text = await res.text();
+        const jcal = ICAL.parse(text);
+        const comp = new ICAL.Component(jcal);
+        const vevents = comp.getAllSubcomponents('vevent');
+
+        const events = vevents.map(e => {
+          const event = new ICAL.Event(e);
+          const start = event.startDate.toJSDate();
+          const end = event.endDate.toJSDate();
+
+          // jen budoucí události
+          if(end < new Date()) return null;
+
+          return {
+            title: 'Obsazeno',
+            start: start,
+            end: end,
+            allDay: true,
+            backgroundColor: '#ff6347',
+            borderColor: '#ff6347',
+            textColor: '#fff'
+          };
+        }).filter(Boolean);
+
+        successCallback(events);
+      } catch(err) {
+        console.error(err);
+        failureCallback(err);
+      }
+    }
+  });
+
+  calendar.render();
+});
+</script>
+
+</body>
+</html>
