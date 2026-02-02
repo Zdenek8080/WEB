@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instrukce PDF</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #333;
+    }
+    .button {
+      display: inline-block;
+      margin: 20px;
+      padding: 15px 25px;
+      font-size: 18px;
+      color: white;
+      background-color: #007acc;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button:hover {
+      background-color: #005fa3;
+    }
+    iframe {
+      width: 80%;
+      height: 600px;
+      margin-top: 40px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Instrukce ke stažení a prohlížení</h1>
+
+  <!-- Tlačítko pro stažení -->
+  <a href="instrukce.pdf" download class="button">Stáhnout PDF</a>
+
+  <!-- Tlačítko pro otevření v novém okně -->
+  <a href="instrukce.pdf" target="_blank" class="button">Otevřít PDF</a>
+
+  <!-- Zobrazení PDF přímo na stránce -->
+  <iframe src="instrukce.pdf"></iframe>
+
+</body>
+</html>
